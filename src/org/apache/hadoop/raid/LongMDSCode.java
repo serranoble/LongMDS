@@ -11,9 +11,21 @@ public class LongMDSCode {
 	private static ArrayList<int[][]> A = null;
 	private static ArrayList<int[][]> S = null;
 	
+	/**
+	 * This class implements a (6,4) Long MDS Code. Other code sizes
+	 * should be implemented manually or through a code generalization.
+	 * This constructor has been created from a generic point of view,
+	 * with the hope that it will be finished later.
+	 * 
+	 * @param stripeSize size of the stripe (must be 6)
+	 * @param paritySize size of the parity (must be 2)
+	 */
 	public LongMDSCode(int stripeSize, int paritySize) {
-		//TODO: need to change this...! 
+		// some constrains that must be satisfied...
 		assert(stripeSize + paritySize < GF.getFieldSize());
+		assert(stripeSize == 6);
+		assert(paritySize == 2);
+		
 		this.stripeSize = stripeSize;
 		this.paritySize = paritySize;
 		generateMatrices();
@@ -70,13 +82,28 @@ public class LongMDSCode {
 	 */
 	public void encode(int[][] data, int[][] parity) {
 		int bufSize = parity.length;
+		int numcols = stripeSize - paritySize;
 		
 		//create the first parity (simple XOR)
 		for (int i = 0; i < bufSize; i++)
 			parity[i][0] = data[i][0];
-		for (int i = 1; i < data[0].length; i++)
-		    for (int j = 0; j < bufSize; j++)
-			    parity[j][0] ^= data[j][i];
+		for (int j = 1; j < numcols; j++)
+		    for (int i = 0; i < bufSize; i++)
+			    parity[i][0] ^= data[i][j];
+		
+		//create the second parity (multiplication-based)
+		for (int i = 0; i < numcols; i++) {
+			//create a temporary vector with all the data for that node
+			int[] temp = new int[bufSize];
+			for (int j = 0; j < bufSize; j++)
+				temp[j] = data[j][i];
+			//multiply node data with the Ax matrix
+			int[] result = GFMatrix.multiply(A.get(i), temp);
+			//copy the result into the 2nd parity
+			for (int j = 0; j < bufSize; j++)
+				//note that we need to ADD the results!!
+				parity[j][1] ^= result[j];
+		}
 	}
 	
 	/*
