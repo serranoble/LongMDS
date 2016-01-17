@@ -107,12 +107,49 @@ public class LongMDSCode {
 	}
 	
 	/*
-	 * With all the survival data and knowing the erased location then it's
+	 * With all the survival data and knowing the erased locations then it's
 	 * possible to calculate all the dependencies required to recover the 
 	 * data efficiently. Nevertheless, using this approach force us to
-	 * recover all the data from the disk (requires optimizations)
+	 * recover all the data from the disk.
 	 */
-	public void decode(int[][] data, int erasedLocation, int[] erasedValue) {
+	public void decode(int[][] data, int[] erasedLocation, int[][] erasedValue) {
+		//the number of erased locations determine the strategy to use...
+		if (erasedLocation.length == 1)
+			recoverOneErasure(data, erasedLocation, erasedValue);
+		else
+			recoverErasures(data, erasedLocation, erasedValue);
+	}
+	
+	/**
+	 * This method will resolve the one erasure problem. Using the simple parity 
+	 * stored in the system is very efficient to recover one error. Note that
+	 * a disk reading strategy is needed (just like XORBAS or MXOR)
+	 * 
+	 * @param data contains all the data read from the disks, including parities
+	 * @param erasedLocation indicates the erased location in the system
+	 * @param erasedValue returns the recovered data 
+	 **/
+	private void recoverOneErasure(int[][] data, int[] erasedLocation, int[][] erasedValue) {
+		// to use this method, data should contains all the surviving nodes
+		// plus the first parity (the simple XOR parity)
+		int bufSize = data.length;
+		int numcols = stripeSize - paritySize - 1;
 		
+		for (int i = 0; i < bufSize; i++)
+			erasedValue[i][0] = data[i][0];
+		for (int j = 1; j < numcols; j++)
+			for (int i = 0; i < bufSize; i++)
+				erasedValue[i][0] ^= data[i][j];
+	}
+	
+	/*
+	 * This method will resolve the two erasure problems. Repair these two erasures
+	 * involves the use of both parities. Solve the problem using this approach
+	 * requires matrix multiplications, which could be slower compared with other
+	 * methods. Is mandatory then to look for any other kind of benefit obtained 
+	 * using this method.
+	 */
+	private void recoverErasures(int[][] data, int[] erasedLocation, int[][] erasedValue) {
+		// TODO: this method should be implemented!
 	}
 }
