@@ -130,6 +130,30 @@ public class LongMDSCode {
 	 * @param erasedValue returns the recovered data 
 	 **/
 	private void recoverOneErasure(int[][] data, int[] erasedLocation, int[][] erasedValue) {
+		/* The decoding mechanism works different for different scenarios,
+	     * this allows us to define a different behavior for every case.
+	     * 
+	     * This code implementation provides 1 elements from the data nodes,
+	     * that element is the data value required to do the process....
+	     * This value should be worked here before to execute the decoding
+	     * (create a vector and multiply it to generate sxNx and sxAxNx locally)
+	     */
+		switch(erasedLocation[0]) {
+			// Here I already have both components multiplied by Sx
+			case 0:
+				//s1N2, s1A2N2, s1N3, s1A3N3, ...
+				break;
+			default:
+				// This is an error... some kind of exception should be thrown
+				break;
+		}
+	}
+	
+	/*
+	 * Dummy method to recreate the simple XOR approach based on brute-force. Not intended to
+	 * use besides testing purposes only.
+	 */
+	private void recoverOneErasureHeavy(int[][] data, int[] erasedLocation, int[][] erasedValue) {
 		// to use this method, data should contains all the surviving nodes
 		// plus the first parity (the simple XOR parity)
 		int bufSize = data.length;
