@@ -150,23 +150,6 @@ public class LongMDSCode {
 	}
 	
 	/*
-	 * Dummy method to recreate the simple XOR approach based on brute-force. Not intended to
-	 * use besides testing purposes only.
-	 */
-	private void recoverOneErasureHeavy(int[][] data, int[] erasedLocation, int[][] erasedValue) {
-		// to use this method, data should contains all the surviving nodes
-		// plus the first parity (the simple XOR parity)
-		int bufSize = data.length;
-		int numcols = stripeSize - paritySize - 1;
-		
-		for (int i = 0; i < bufSize; i++)
-			erasedValue[i][0] = data[i][0];
-		for (int j = 1; j < numcols; j++)
-			for (int i = 0; i < bufSize; i++)
-				erasedValue[i][0] ^= data[i][j];
-	}
-	
-	/*
 	 * This method will resolve the two erasure problems. Repair these two erasures
 	 * involves the use of both parities. Solve the problem using this approach
 	 * requires matrix multiplications, which could be slower compared with other
